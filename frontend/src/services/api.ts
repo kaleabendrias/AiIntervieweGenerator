@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface GenerateResponse {
   questions: string[];
@@ -18,6 +18,10 @@ export const generateQuestions = async (
   jobTitle: string,
   signal?: AbortSignal,
 ): Promise<string[]> => {
+  if (!API_URL) {
+    throw new ApiError('Missing VITE_API_URL. Set it in your frontend environment.');
+  }
+
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/questions`, {
