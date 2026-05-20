@@ -33,7 +33,7 @@ const num = (key: string, fallback: number): number => {
 
 export const env: Env = {
   port: num('PORT', 5000),
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  corsOrigin: process.env.CORS_ORIGIN ?? 'https://ai-interviewe-generator.vercel.app/',
   groqApiKey: requireEnv('GROQ_API_KEY'),
   groqModel: process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile',
   groqTimeoutMs: num('GROQ_TIMEOUT_MS', 15_000),
