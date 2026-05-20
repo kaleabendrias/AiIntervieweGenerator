@@ -5,14 +5,17 @@ import { HttpError } from '../middleware/errorHandler';
 const client = new Groq({ apiKey: env.groqApiKey });
 
 const SYSTEM_PROMPT =
-  'You are an expert technical recruiter. When asked, you generate concise, ' +
-  'realistic, role-specific interview questions and return ONLY the questions ' +
-  'with no preamble, numbering, or commentary.';
+  'You are an expert technical recruiter. Validate whether the provided job title ' +
+  'looks like a real job role before generating questions.';
 
 const buildUserPrompt = (jobTitle: string): string =>
-  `Generate exactly 3 professional interview questions for the position of "${jobTitle}".
+  `Job title input: "${jobTitle}"
 
 Rules:
+- If the job title is not a plausible real role (for example random numbers, gibberish, or meaningless text),
+  return exactly this line and nothing else:
+  INVALID_JOB_TITLE
+- If valid, generate exactly 3 professional interview questions for that role.
 - Each question is one sentence.
 - Questions must be tailored to the responsibilities and skills of the role.
 - Return ONLY the three questions, one per line. No numbering, bullets, or extra text.`;
@@ -70,6 +73,9 @@ export const generateInterviewQuestions = async (jobTitle: string): Promise<stri
   }
 
   const questions = parseQuestions(text);
+  if (text.trim() === 'INVALID_JOB_TITLE') {
+    throw new HttpError(400, 'This does not look like a real job title');
+  }
   if (questions.length < 3) {
     throw new HttpError(502, 'LLM returned an unexpected response');
   }
